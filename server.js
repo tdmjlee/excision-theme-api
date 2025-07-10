@@ -22,7 +22,7 @@ function listFiles(dir, baseDir = '') {
   return results;
 }
 
-// List all theme files
+// GET /theme-files/list
 app.get('/theme-files/list', (req, res) => {
   try {
     const files = listFiles(THEME_ROOT);
@@ -32,27 +32,24 @@ app.get('/theme-files/list', (req, res) => {
   }
 });
 
-// Get a specific theme file
-app.get('/theme-files/:filepath(*)', (req, res) => {
-  const requestedPath = req.params.filepath;
+
+// GET /theme-files/* — retrieve file contents
+app.get('/theme-files/*', (req, res) => {
+  const requestedPath = req.params[0];
   const filePath = path.join(THEME_ROOT, requestedPath);
   console.log('GET requested for:', requestedPath);
-
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath, {
-      headers: {
-        'Content-Disposition': 'inline'
-      }
-    });
+    res.sendFile(filePath, { headers: { 'Content-Disposition': 'inline' } });
   } else {
-    console.error('File not found:', filePath);
     res.status(404).send('File not found');
   }
 });
 
-// Update a theme file
-app.put('/theme-files/:filepath(*)', (req, res) => {
-  const filePath = path.join(THEME_ROOT, req.params.filepath);
+
+// PUT /theme-files/* — update file contents
+app.put('/theme-files/*', (req, res) => {
+  const requestedPath = req.params[0];
+  const filePath = path.join(THEME_ROOT, requestedPath);
   try {
     fs.writeFileSync(filePath, req.body.content || '', 'utf8');
     res.json({ status: 'updated' });
