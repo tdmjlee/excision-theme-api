@@ -23,6 +23,7 @@ function listFiles(dir, baseDir = '') {
 }
 
 
+
 // GET /theme-files/list
 app.get('/theme-files/list', (req, res) => {
   try {
@@ -36,6 +37,7 @@ app.get('/theme-files/list', (req, res) => {
 // GET /theme-files/:filepath(*) - Read a theme file
 app.get('/theme-files/:filepath(*)', (req, res) => {
   const filePath = path.join(THEME_ROOT, req.params.filepath);
+  console.log("GET requested for:", req.params.filepath); // Debug log
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath, { headers: { 'Content-Disposition': 'inline' } });
   } else {
