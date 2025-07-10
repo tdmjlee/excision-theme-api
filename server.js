@@ -6,7 +6,7 @@ const app = express();
 const THEME_ROOT = path.join(__dirname, 'excision-theme');
 app.use(express.json());
 
-// Recursively list all files
+// Helper: Recursively list all theme files
 function listFiles(dir, baseDir = '') {
   let results = [];
   const list = fs.readdirSync(dir, { withFileTypes: true });
@@ -22,9 +22,7 @@ function listFiles(dir, baseDir = '') {
   return results;
 }
 
-
-
-// GET /theme-files/list
+// List all theme files
 app.get('/theme-files/list', (req, res) => {
   try {
     const files = listFiles(THEME_ROOT);
@@ -34,18 +32,25 @@ app.get('/theme-files/list', (req, res) => {
   }
 });
 
-// GET /theme-files/:filepath(*) - Read a theme file
+// Get a specific theme file
 app.get('/theme-files/:filepath(*)', (req, res) => {
-  const filePath = path.join(THEME_ROOT, req.params.filepath);
-  console.log("GET requested for:", req.params.filepath); // Debug log
+  const requestedPath = req.params.filepath;
+  const filePath = path.join(THEME_ROOT, requestedPath);
+  console.log('GET requested for:', requestedPath);
+
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath, { headers: { 'Content-Disposition': 'inline' } });
+    res.sendFile(filePath, {
+      headers: {
+        'Content-Disposition': 'inline'
+      }
+    });
   } else {
+    console.error('File not found:', filePath);
     res.status(404).send('File not found');
   }
 });
 
-// PUT /theme-files/:filepath(*) - Update a theme file
+// Update a theme file
 app.put('/theme-files/:filepath(*)', (req, res) => {
   const filePath = path.join(THEME_ROOT, req.params.filepath);
   try {
