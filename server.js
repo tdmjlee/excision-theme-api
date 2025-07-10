@@ -39,7 +39,12 @@ app.get('/theme-files/*', (req, res) => {
   const filePath = path.join(THEME_ROOT, requestedPath);
   console.log('GET requested for:', requestedPath);
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath, { headers: { 'Content-Disposition': 'inline' } });
+    res.sendFile(filePath, {
+      headers: {
+        'Content-Disposition': 'inline; filename="' + path.basename(filePath) + '"',
+        'Content-Type': 'text/plain'
+      }
+    });
   } else {
     res.status(404).send('File not found');
   }
@@ -61,4 +66,5 @@ app.put('/theme-files/*', (req, res) => {
 app.listen(3000, () => {
   console.log('Theme API running at http://localhost:3000');
 });
+
 
